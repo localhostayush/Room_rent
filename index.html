@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Room Rent Service</title>
+    <style>
+        /* CSS Styles */
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f9;
+            color: #333;
+        }
+
+        header {
+            background-color: #4CAF50;
+            color: white;
+            text-align: center;
+            padding: 1em 0;
+        }
+
+        .container {
+            padding: 2em;
+        }
+
+        .room {
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            background-color: #fff;
+            padding: 1.5em;
+            margin-bottom: 1.5em;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            transition: transform 0.2s ease-in-out;
+        }
+
+        .room:hover {
+            transform: scale(1.02);
+        }
+
+        .room h3 {
+            margin: 0 0 0.5em 0;
+            color: #4CAF50;
+        }
+
+        .room p {
+            margin: 0.5em 0;
+        }
+
+        .stars {
+            display: flex;
+            align-items: center;
+        }
+
+        .stars input {
+            display: none;
+        }
+
+        .stars label {
+            font-size: 1.5em;
+            color: #ddd;
+            cursor: pointer;
+            transition: color 0.2s ease-in-out;
+        }
+
+        .stars input:checked ~ label {
+            color: gold;
+        }
+
+        .stars label:hover,
+        .stars label:hover ~ label {
+            color: gold;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Room Rent Service</h1>
+    </header>
+    <div class="container">
+        <!-- Room data will be dynamically injected here -->
+    </div>
+
+    <script>
+        // Function to load and parse CSV file
+        async function loadCSV(filePath) {
+            const response = await fetch(filePath);
+            const data = await response.text();
+            return parseCSV(data);
+        }
+
+        // Function to parse CSV data into an array of objects
+        function parseCSV(data) {
+            const rows = data.split("\n").filter(row => row.trim() !== "");
+            const headers = rows[0].split(",");
+            return rows.slice(1).map(row => {
+                const values = row.split(",");
+                return headers.reduce((acc, header, index) => {
+                    acc[header.trim()] = values[index].trim();
+                    return acc;
+                }, {});
+            });
+        }
+
+        // Function to render rooms dynamically
+        function renderRooms(rooms) {
+            const container = document.querySelector('.container');
+            rooms.forEach(room => {
+                const roomElement = document.createElement('div');
+                roomElement.className = 'room';
+                roomElement.innerHTML = `
+                    <h3>${room['Room ID']}</h3>
+                    <p><strong>Location:</strong> ${room['Location']}</p>
+                    <p><strong>Price:</strong> $${room['Price (USD)']}/month</p>
+                    <p><strong>BHK:</strong> ${room['BHK']} BHK</p>
+                    <p><strong>Owner Rating:</strong></p>
+                    <div class="stars">
+                        <input type="radio" id="star5-owner-${room['Room ID']}" name="rating-owner-${room['Room ID']}" value="5">
+                        <label for="star5-owner-${room['Room ID']}">&#9733;</label>
+                        <input type="radio" id="star4-owner-${room['Room ID']}" name="rating-owner-${room['Room ID']}" value="4">
+                        <label for="star4-owner-${room['Room ID']}">&#9733;</label>
+                        <input type="radio" id="star3-owner-${room['Room ID']}" name="rating-owner-${room['Room ID']}" value="3">
+                        <label for="star3-owner-${room['Room ID']}">&#9733;</label>
+                        <input type="radio" id="star2-owner-${room['Room ID']}" name="rating-owner-${room['Room ID']}" value="2">
+                        <label for="star2-owner-${room['Room ID']}">&#9733;</label>
+                        <input type="radio" id="star1-owner-${room['Room ID']}" name="rating-owner-${room['Room ID']}" value="1">
+                        <label for="star1-owner-${room['Room ID']}">&#9733;</label>
+                    </div>
+                    <p><strong>Renter Rating:</strong></p>
+                    <div class="stars">
+                        <input type="radio" id="star5-renter-${room['Room ID']}" name="rating-renter-${room['Room ID']}" value="5">
+                        <label for="star5-renter-${room['Room ID']}">&#9733;</label>
+                        <input type="radio" id="star4-renter-${room['Room ID']}" name="rating-renter-${room['Room ID']}" value="4">
+                        <label for="star4-renter-${room['Room ID']}">&#9733;</label>
+                        <input type="radio" id="star3-renter-${room['Room ID']}" name="rating-renter-${room['Room ID']}" value="3">
+                        <label for="star3-renter-${room['Room ID']}">&#9733;</label>
+                        <input type="radio" id="star2-renter-${room['Room ID']}" name="rating-renter-${room['Room ID']}" value="2">
+                        <label for="star2-renter-${room['Room ID']}">&#9733;</label>
+                        <input type="radio" id="star1-renter-${room['Room ID']}" name="rating-renter-${room['Room ID']}" value="1">
+                        <label for="star1-renter-${room['Room ID']}">&#9733;</label>
+                    </div>
+                `;
+                container.appendChild(roomElement);
+            });
+        }
+
+        // Main function to load data and render rooms
+        async function main() {
+            const rooms = await loadCSV('room_rent_dataset.csv');
+            renderRooms(rooms);
+        }
+
+        // Execute the main function on page load
+        main();
+    </script>
+</body>
+</html>
